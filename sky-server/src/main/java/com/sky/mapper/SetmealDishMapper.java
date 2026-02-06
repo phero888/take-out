@@ -7,10 +7,16 @@ import java.util.List;
 
 @Mapper
 public interface SetmealDishMapper {
+
     /**
      * 批量添加套餐菜品关系
      * @param setmealDishes
      */
-
     void insertBatch(List<SetmealDish> setmealDishes);
+
+    /**
+     * 通过setmeal_id批量删除套餐对应菜品信息
+     * @param ids
+     */
+    void deleteBySetmealIdBatch(List<Long> ids);
 }

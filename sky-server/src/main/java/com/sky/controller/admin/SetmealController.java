@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/admin/setmeal")
@@ -26,14 +28,29 @@ public class SetmealController {
         return Result.success(pageResult);
     }
 
-//    新增套餐
+    /**
+     * 新增套餐
+     * @param setmealDTO
+     * @return
+     */
     @PostMapping
     public Result save(@RequestBody SetmealDTO setmealDTO){
         log.info("新增套餐...");
         setMealService.save(setmealDTO);
         return Result.success();
     }
-//    删除套餐
+
+    /**
+     * 批量删除套餐
+      * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public Result deleteBatch(@RequestParam List<Long>ids){
+        log.info("批量删除套餐");
+        setMealService.deleteBatchWithDish(ids);
+        return Result.success();
+    }
 //    修改套餐
 //    起售停售套餐
 }

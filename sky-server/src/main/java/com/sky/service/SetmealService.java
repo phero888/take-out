@@ -4,6 +4,8 @@ import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.result.PageResult;
 
+import java.util.List;
+
 public interface SetmealService {
 
     /**
@@ -18,4 +20,10 @@ public interface SetmealService {
      * @param setmealDTO
      */
     void save(SetmealDTO setmealDTO);
+
+    /**
+     * 批量删除套餐及套餐菜品关系
+     * @param ids
+     */
+    void deleteBatchWithDish(List<Long> ids);
 }

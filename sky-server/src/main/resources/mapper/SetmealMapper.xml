@@ -23,4 +23,22 @@
         values
         (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{status}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
     </insert>
+    <select id="getStatusByIdBatch" resultType="java.lang.Integer">
+        select sum(status) from setmeal
+        <where>
+            id IN
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+    <delete id="deleteBatch">
+        delete from setmeal
+        <where>
+            id IN
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </delete>
 </mapper>
