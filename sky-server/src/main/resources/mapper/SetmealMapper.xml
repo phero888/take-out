@@ -6,13 +6,13 @@
         select s.*,c.name as Category_name from setmeal s join category c on s.category_id = c.id
         <where>
             <if test="name!= null">
-                and d.name like concat('%',#{name},'%')
+                and s.name like concat('%',#{name},'%')
             </if>
             <if test="categoryId != null">
-                and d.category_id like concat('%',#{categoryId},'%')
+                and s.category_id like concat('%',#{categoryId},'%')
             </if>
             <if test="status!= null">
-                and d.status like concat('%',#{status},'%')
+                and s.status like concat('%',#{status},'%')
             </if>
         </where>
         order by create_time desc
