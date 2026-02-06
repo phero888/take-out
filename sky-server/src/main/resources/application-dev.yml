@@ -11,3 +11,7 @@ sky:
     access-key-id: LTAI5tQ1FTn73MmcfxNLyupp
     access-key-secret: cgEycvdcKQa0AK7oXe5NWVmyYObpR5
     bucket-name: fq-take-out
+  redis:
+    host: localhost
+    port: 6379
+    database: 1
