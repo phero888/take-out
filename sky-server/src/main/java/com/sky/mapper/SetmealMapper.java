@@ -49,7 +49,14 @@ public interface SetmealMapper {
     /**
      * 通用更新套餐
      * @param setmeal
-     */
+     */    @AutoFill(OperationType.UPDATE)
     void update(Setmeal setmeal);
 
+    /**
+     * 通过id获取套餐基础信息
+     * @param id
+     * @return
+     */
+    @Select("select * from setmeal where id = #{id}")
+    Setmeal getById(Long id);
 }

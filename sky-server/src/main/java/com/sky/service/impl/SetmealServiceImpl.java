@@ -17,6 +17,7 @@ import com.sky.service.SetmealService;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,5 +90,33 @@ public class SetmealServiceImpl implements SetmealService {
             if(DishStatus == dishId.size()) setmealMapper.update(setmeal);
             else throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
         }
+    }
+    /**
+     * 修改套餐
+     * @param setmealDTO
+     */
+    @Override
+    @Transactional
+    public void update(SetmealDTO setmealDTO) {
+        //修改套餐基础数据
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO,setmeal);
+        setmealMapper.update(setmeal);
+        //修改套餐关联菜品数据
+        //先删除之前的所有数据
+        setmealDishMapper.deleteBySetmealIdBatch(List.of(setmeal.getId()));
+        //新增数据
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        for(SetmealDish setmealDish : setmealDishes) setmealDish.setSetmealId(setmeal.getId());
+        setmealDishMapper.insertBatch(setmealDishes);
+    }
+
+    @Override
+    public SetmealVO getById(Long id) {
+        Setmeal setmeal = setmealMapper.getById(id);
+        SetmealVO setmealVO = new SetmealVO();
+        BeanUtils.copyProperties(setmeal,setmealVO);
+        setmealVO.setSetmealDishes(setmealDishMapper.getBySetmealId(id));
+        return setmealVO;
     }
 }
