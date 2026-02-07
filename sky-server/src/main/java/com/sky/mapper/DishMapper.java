@@ -36,7 +36,7 @@ public interface DishMapper {
      * @param ids
      * @return
      */
-    Integer getStatueByIdBatch(List<Long> ids);
+    Integer getStatusByIdBatch(List<Long> ids);
 
     /**
      * 批量查询菜品套餐情况

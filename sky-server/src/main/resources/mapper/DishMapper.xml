@@ -25,12 +25,12 @@
         order by create_time desc
     </select>
 
-    <select id="getStatueByIdBatch" resultType="java.lang.Integer">
+    <select id="getStatusByIdBatch" resultType="java.lang.Integer">
         select count(id) from dish
         <where>
             status = 1
             and id IN
-            <foreach collection="ids" item="id" open="(" close=")">
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
                 #{id}
             </foreach>
         </where>

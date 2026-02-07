@@ -52,5 +52,17 @@ public class SetmealController {
         return Result.success();
     }
 //    修改套餐
-//    起售停售套餐
+
+    /**
+     * 起售停售套餐
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public Result startOrStop(@PathVariable Integer status, @RequestParam Long id){
+        log.info("修改套餐状态：{}", status);
+        setMealService.startOrStop(status,id);
+        return Result.success();
+    }
 }

@@ -71,7 +71,7 @@ public class DishServiceImpl implements DishService {
     @Override
     @Transactional
     public void deleteBatch(List<Long> ids) {
-        Integer statueCount = dishMapper.getStatueByIdBatch(ids);
+        Integer statueCount = dishMapper.getStatusByIdBatch(ids);
         if(statueCount >0) throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
         Integer SetMealCount = dishMapper.getSetMealByIdBatch(ids);
         if (SetMealCount>0) throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
@@ -126,7 +126,14 @@ public class DishServiceImpl implements DishService {
                 .id(id)
                 .status(status)
                 .build();
+        if(status == 0){
+            ArrayList<Long> ids = new ArrayList<>();
+            ids.add(id);
+            Integer SetMealCount = dishMapper.getSetMealByIdBatch(ids);
+            if (SetMealCount>0) throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
         dishMapper.update(dish);
+
     }
 
     /**
@@ -136,8 +143,7 @@ public class DishServiceImpl implements DishService {
      */
     @Override
     public List<DishVO> getByCategoryId(Long categoryId) {
-        List<DishVO> list = dishMapper.getByCategoryId(categoryId);
-        return list;
+        return dishMapper.getByCategoryId(categoryId);
     }
 
 }
