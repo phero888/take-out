@@ -62,10 +62,10 @@ public interface DishMapper {
     void update(Dish dish);
 
     /**
-     * 通过分类id查询菜品
-     * @param categoryId
+     * 动态查询菜品
+     *
+     * @param dish
      * @return
      */
-    @Select("select * from dish where category_id = #{categoryId}")
-    List<DishVO> getByCategoryId(Long categoryId);
+    List<DishVO> list(Dish dish);
 }
