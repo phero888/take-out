@@ -35,15 +35,7 @@
             </foreach>
         </where>
     </select>
-    <select id="getSetMealByIdBatch" resultType="java.lang.Integer">
-        select count(dish_id) from setmeal_dish
-        <where>
-            dish_id IN
-            <foreach collection="ids" item="dishId" open="(" close=")">
-                #{dishId}
-            </foreach>
-        </where>
-    </select>
+
     <delete id="deleteBatch">
         delete from dish
         <where>
@@ -99,5 +91,14 @@
             </if>
         </where>
         order by create_time desc
+    </select>
+    <select id="getCategoryIdByIdBatch" resultType="java.lang.Long">
+        select distinct category_id from dish
+        <where>
+            id IN
+            <foreach collection="ids" item="id" separator="," close=")" open="(">
+                #{id}
+            </foreach>
+        </where>
     </select>
 </mapper>

@@ -38,12 +38,7 @@ public interface DishMapper {
      */
     Integer getStatusByIdBatch(List<Long> ids);
 
-    /**
-     * 批量查询菜品套餐情况
-     * @param ids
-     * @return
-     */
-    Integer getSetMealByIdBatch(List<Long> ids);
+
 
     /**
      * 批量删除菜品
@@ -68,4 +63,11 @@ public interface DishMapper {
      * @return
      */
     List<DishVO> list(Dish dish);
+
+    /**
+     * 通过菜品id批量获取分类id
+     * @param ids
+     * @return
+     */
+    List<Long> getCategoryIdByIdBatch(List<Long> ids);
 }

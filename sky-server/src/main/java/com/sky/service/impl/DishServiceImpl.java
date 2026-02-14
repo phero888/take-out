@@ -8,9 +8,12 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.Setmeal;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.DishFlavorMapper;
+import com.sky.mapper.SetmealDishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -30,6 +33,10 @@ public class DishServiceImpl implements DishService {
     private DishMapper dishMapper;
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private SetmealMapper setmealMapper;
     /**
      * 新增菜品和口味
      */
@@ -73,8 +80,8 @@ public class DishServiceImpl implements DishService {
     public void deleteBatch(List<Long> ids) {
         Integer statueCount = dishMapper.getStatusByIdBatch(ids);
         if(statueCount >0) throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
-        Integer SetMealCount = dishMapper.getSetMealByIdBatch(ids);
-        if (SetMealCount>0) throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        List<Long> setmealIds = setmealDishMapper.getSetMealByIdBatch(ids);
+        if (setmealIds != null && !setmealIds.isEmpty()) throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         dishMapper.deleteBatch(ids);
         dishFlavorMapper.deleteBatch(ids);
     }
@@ -121,16 +128,26 @@ public class DishServiceImpl implements DishService {
      * @param status
      */
     @Override
+    @Transactional
     public void startOrStop(Long id, Integer status) {
         Dish dish = Dish.builder()
                 .id(id)
                 .status(status)
                 .build();
-        if(status == 0){
+        if(status == StatusConstant.DISABLE){
             ArrayList<Long> ids = new ArrayList<>();
             ids.add(id);
-            Integer SetMealCount = dishMapper.getSetMealByIdBatch(ids);
-            if (SetMealCount>0) throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+            List<Long> setmealIds = setmealDishMapper.getSetMealByIdBatch(ids);
+            if (setmealIds != null && !setmealIds.isEmpty()){
+                // 只要有关联的套餐，全部统一停售
+                for (Long setmealId : setmealIds) {
+                    Setmeal setmeal = Setmeal.builder()
+                            .id(setmealId)
+                            .status(StatusConstant.DISABLE) // 强制设为停售
+                            .build();
+                    setmealMapper.update(setmeal);
+                }
+            }
         }
         dishMapper.update(dish);
 
@@ -167,6 +184,11 @@ public class DishServiceImpl implements DishService {
         }
 
         return dishVOList;
+    }
+
+    @Override
+    public List<Long> getCategoryIdByIdBatch(List<Long> ids) {
+        return dishMapper.getCategoryIdByIdBatch(ids);
     }
 
 }

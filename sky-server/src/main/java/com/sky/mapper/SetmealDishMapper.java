@@ -23,7 +23,7 @@ public interface SetmealDishMapper {
 
     /**
      * 通过套餐id查询菜品
-     * @param id
+     * @param setmealId
      * @return
      */
     @Select("select * from setmeal_dish where setmeal_id = #{setmealId}")
@@ -32,9 +32,17 @@ public interface SetmealDishMapper {
 
     /**
      * 通过套餐id查询菜品id
-     * @param id
+     * @param setmealId
      * @return
      */
     @Select("select dish_id from setmeal_dish where setmeal_id = #{setmealId}")
     List<Long> getDishIdBySetmealId(Long setmealId);
+
+    /**
+     * 批量查询菜品套餐情况
+     * @param ids
+     * @return
+     */
+    List<Long> getSetMealByIdBatch(List<Long> ids);
+
 }

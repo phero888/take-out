@@ -10,6 +10,16 @@
         </foreach>
     </insert>
 
+    <select id="getSetMealByIdBatch" resultType="java.lang.Long">
+        select distinct setmeal_id from setmeal_dish
+        <where>
+            dish_id IN
+            <foreach collection="ids" item="dishId" open="(" close=")" separator=",">
+                #{dishId}
+            </foreach>
+        </where>
+    </select>
+
     <delete id="deleteBySetmealIdBatch">
         delete from setmeal_dish
         <where>

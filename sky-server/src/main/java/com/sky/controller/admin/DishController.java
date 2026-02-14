@@ -8,6 +8,7 @@ import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,9 @@ import java.util.List;
 public class DishController {
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
+    public static final String DISH = "dish_";
 
     @PostMapping
     public Result save(@RequestBody DishDTO dishDTO){
@@ -34,7 +38,13 @@ public class DishController {
     @DeleteMapping
     public Result delete(@RequestParam List<Long> ids){
         log.info("菜品删除");
+        //在执行删除之前，获取菜品所在分类
+        List<Long> categoryIds = dishService.getCategoryIdByIdBatch(ids);
         dishService.deleteBatch(ids);
+        for (Long categoryId: categoryIds) {
+            String key = DISH + categoryId;
+            redisTemplate.delete(key);
+        }
         return Result.success();
     }
 
