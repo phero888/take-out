@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.aliyuncs.ecs.model.v20140526.CreateDiskRequest;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
@@ -120,6 +121,8 @@ public class DishServiceImpl implements DishService {
             flavor.setDishId(dish.getId());
         }
         dishFlavorMapper.insertBatch(flavors);
+        //redis清空缓存
+
     }
 
     /**
