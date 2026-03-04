@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+//这里OrderVO继承了Orders！！！！！ -> 具有Orders的所有属性
 public class OrderVO extends Orders implements Serializable {
 
     //订单菜品信息

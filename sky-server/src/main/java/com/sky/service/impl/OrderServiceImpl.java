@@ -1,7 +1,11 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersDTO;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.AddressBook;
@@ -14,11 +18,14 @@ import com.sky.mapper.AddressBookMapper;
 import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingCartMapper;
+import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -119,13 +126,47 @@ public class OrderServiceImpl implements OrderService {
         return new OrderPaymentVO();
     }
 
+    @Override
+    public PageResult pageQuery4user(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
+        Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO);
+        List<OrderVO> orderVOS = new ArrayList<>();
+        if (page != null || !page.isEmpty()) {
+            for (Orders orders : page) {
+                List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(orders.getId());
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(orders, orderVO);
+                orderVO.setOrderDetailList(orderDetails);
+                orderVOS.add(orderVO);
+            }
+        }
+        return new PageResult(page.getTotal(), orderVOS);
+
+    }
+
+    /**
+     * 查询订单详细信息
+     * @param id
+     * @return
+     */
+    @Override
+    public OrderVO details(Long id) {
+        Orders orders = orderMapper.getById(id);
+        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(id);
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(orders,orderVO);
+        orderVO.setOrderDetailList(orderDetails);
+        return orderVO;
+    }
+
     /**
      * 支付成功
      * @param orderNumber
      */
     public void paySuccess(String orderNumber){
         //1. 获取订单
-        Orders orders = orderMapper.getById(orderNumber);
+        Orders orders = orderMapper.getByNumber(orderNumber);
         //2. 如果订单已支付，返回（防止二次支付）
         //3. 修改订单支付状态
         // 根据订单id更新订单的状态、支付方式、支付状态、结账时间
