@@ -30,22 +30,4 @@
         </where>
     </delete>
 
-    <update id="update" parameterType="com.sky.dto.DishDTO">
-        update dish
-        <set>
-
-            <if test="description != null">
-                description = #{description},
-            </if>
-            <if test="updateTime != null">
-                update_time = #{updateTime},
-            </if>
-            <if test="updateUser != null">
-                update_user = #{updateUser},
-            </if>
-        </set>
-        <where>
-            id = #{id}
-        </where>
-    </update>
 </mapper>

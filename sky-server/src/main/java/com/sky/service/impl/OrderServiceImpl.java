@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.controller.admin.ShopController;
 import com.sky.dto.*;
 import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
@@ -22,9 +23,9 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
-import net.bytebuddy.asm.Advice;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,6 +46,8 @@ public class OrderServiceImpl implements OrderService {
     public OrderDetailMapper orderDetailMapper;
     @Autowired
     public ShoppingCartMapper shoppingCartMapper;
+    @Autowired
+    public RedisTemplate redisTemplate;
 
     /**
      * 用户下单
@@ -65,6 +68,12 @@ public class OrderServiceImpl implements OrderService {
         //地址
         AddressBook addressBook = addressBookMapper.getById(ordersSubmitDTO.getAddressBookId());
         if(addressBook == null) throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
+
+        //检查店铺营业状态
+        Integer shopStatus = (Integer) redisTemplate.opsForValue().get(ShopController.KEY);
+        if (shopStatus == null || shopStatus == 0) {
+            throw new OrderBusinessException(MessageConstant.SHOP_CLOSED);
+        }
 
         //2. 添加1条订单
         Orders orders = new Orders();
@@ -186,13 +195,13 @@ public class OrderServiceImpl implements OrderService {
 //        - 待支付和待接单状态下，用户可直接取消订单
 //        - 如果在待接单状态下取消订单，需要给用户退款
 //        - 取消订单后需要将订单状态修改为“已取消”
-        Orders.builder()
-                .id(id)
-                .status(Orders.CANCELLED)
-                .cancelReason(MessageConstant.USER_CANCEL)
-                .cancelTime(LocalDateTime.now())
-                .build();
-        orderMapper.update(orders);
+        Orders cancelOrders = Orders.builder()
+                        .id(id)
+                        .status(Orders.CANCELLED)
+                        .cancelReason(MessageConstant.USER_CANCEL)
+                        .cancelTime(LocalDateTime.now())
+                        .build();
+        orderMapper.update(cancelOrders);
     }
 
     /**
@@ -317,7 +326,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void delivery(Long id) {
 //        - 只有状态为“待派送”的订单可以执行派送订单操作
-        if(orderMapper.getById(id).getStatus() == Orders.TO_BE_CONFIRMED) {
+        if(orderMapper.getById(id).getStatus() == Orders.CONFIRMED) {
 //        - 派送订单其实就是将订单状态修改为“派送中”
             Orders orders = Orders.builder()
                     .id(id)

@@ -70,4 +70,7 @@ public interface DishMapper {
      * @return
      */
     List<Long> getCategoryIdByIdBatch(List<Long> ids);
+
+    @Select("select count(*) from dish where status = #{status}")
+    Integer countByStatus(Integer status);
 }

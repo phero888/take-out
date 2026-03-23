@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("UserOrderController")
-@RequestMapping("user/order")
+@RequestMapping("/user/order")
 @Slf4j
 public class OrderController {
 
@@ -41,7 +41,7 @@ public class OrderController {
      * @param ordersPaymentDTO
      * @return
      */
-    @PostMapping("/pay")
+    @PutMapping("/payment")
     public Result<OrderPaymentVO> pay(@RequestBody OrdersPaymentDTO ordersPaymentDTO){
         log.info("用户支付");
         OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);
@@ -54,7 +54,7 @@ public class OrderController {
      * @return
      */
     @GetMapping("/historyOrders")
-    public Result<PageResult> pageQuery(@RequestBody OrdersPageQueryDTO ordersPageQueryDTO){
+    public Result<PageResult> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO){
         log.info("查询历史订单：{}",ordersPageQueryDTO);
         PageResult pageResult = orderService.pageQuery4user(ordersPageQueryDTO);
         return Result.success(pageResult);
@@ -93,6 +93,12 @@ public class OrderController {
     public Result repetition(@PathVariable Long id){
         log.info("再来一单：{}",id);
         orderService.repetition(id);
+        return Result.success();
+    }
+
+    @GetMapping("/reminder/{id}")
+    public Result reminder(@PathVariable Long id){
+        log.info("催单：{}",id);
         return Result.success();
     }
 }

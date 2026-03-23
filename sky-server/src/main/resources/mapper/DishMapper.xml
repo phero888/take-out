@@ -40,7 +40,7 @@
         delete from dish
         <where>
             id IN
-            <foreach collection="ids" item="id" open="(" close=")">
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
                 #{id}
             </foreach>
         </where>
@@ -96,7 +96,7 @@
         select distinct category_id from dish
         <where>
             id IN
-            <foreach collection="ids" item="id" separator="," close=")" open="(">
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
                 #{id}
             </foreach>
         </where>

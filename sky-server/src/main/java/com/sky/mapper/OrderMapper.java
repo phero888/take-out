@@ -7,6 +7,8 @@ import com.sky.vo.OrderStatisticsVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
+
 
 @Mapper
 public interface OrderMapper {
@@ -45,10 +47,22 @@ public interface OrderMapper {
     @Select("select * from orders where id = #{id}")
     Orders getById(Long id);
 
-    @Select("select" +
-            "sum((case when status = 2 then 1 else 0 end),0) as toBeConfirmed," +
-            "sum((case when status = 3 then 1 else 0 end),0) as confirmed," +
-            "sum((case when status = 4 then 1 else 0 end),0) as deliveryInProgress" +
+    @Select("select " +
+            "sum(case when status = 2 then 1 else 0 end) as toBeConfirmed," +
+            "sum(case when status = 3 then 1 else 0 end) as confirmed," +
+            "sum(case when status = 4 then 1 else 0 end) as deliveryInProgress " +
             "from orders")
     OrderStatisticsVO statistics();
+
+    @Select("select ifnull(sum(amount),0) from orders where order_time >= #{begin} and order_time <= #{end} and status != 5")
+    Double sumAmountByDate(LocalDateTime begin, LocalDateTime end);
+
+    @Select("select count(*) from orders where order_time >= #{begin} and order_time <= #{end} and status != 5")
+    Integer countByDate(LocalDateTime begin, LocalDateTime end);
+
+    @Select("select count(*) from orders where order_time >= #{begin} and order_time <= #{end}")
+    Integer countAll();
+
+    @Select("select count(*) from orders where status = #{status}")
+    Integer countByStatus(Integer status);
 }

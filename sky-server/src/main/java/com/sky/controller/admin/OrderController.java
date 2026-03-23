@@ -29,7 +29,7 @@ public class OrderController {
      * @return
      */
     @GetMapping("/conditionSearch")
-    public Result<PageResult> conditionSearch(@RequestBody OrdersPageQueryDTO ordersPageQueryDTO){
+    public Result<PageResult> conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO){
         log.info("条件搜素订单：{}",ordersPageQueryDTO);
         PageResult pageResult = orderService.pageQuery4admin(ordersPageQueryDTO);
         return Result.success(pageResult);

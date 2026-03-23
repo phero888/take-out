@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user/shopppingCart")
+@RequestMapping("/user/shoppingCart")
 @Slf4j
 public class ShoppingCartController {
     @Autowired
@@ -37,5 +37,12 @@ public class ShoppingCartController {
         shoppingCartService.cleanShoppingCart();
         return Result.success();
 
+    }
+
+    @PostMapping("/sub")
+    public Result sub(@RequestBody ShoppingCartDTO shoppingCartDTO){
+        log.info("减少购物车，商品信息为：{}",shoppingCartDTO);
+        shoppingCartService.subShoppingCart(shoppingCartDTO);
+        return Result.success();
     }
 }
